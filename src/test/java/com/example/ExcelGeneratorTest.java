@@ -19,6 +19,7 @@ public class ExcelGeneratorTest {
 
     private List<Company> companies;
 
+    private List<Country> countries;
     @BeforeEach
     void setUp() {
         departments = List.of(
@@ -72,8 +73,36 @@ public class ExcelGeneratorTest {
             Company.builder()
                     .name("나쁜 회사")
                     .departments(departments)
-                    .build()
+                    .build(),
+                Company.builder()
+                        .name("이상한 회사")
+                        .departments(departments)
+                        .build()
         );
+
+        countries = List.of(
+                Country.builder()
+                        .name("대한민국")
+                        .companies(companies)
+                        .build(),
+                Country.builder()
+                        .name("미국")
+                        .companies(companies)
+                        .build(),
+                Country.builder()
+                        .name("독일")
+                        .companies(companies)
+                        .build()
+        );
+    }
+    @Test
+    public void employees_excel_generate_test() {
+        this.generator = new ExcelGenerator("object_collection_template.xls");
+        this.generator.addMappingValue("employees", departments.get(0).getEmployees());
+
+        Assertions.assertDoesNotThrow(() -> {
+            generator.generate("output-employees.xlsx");
+        });
     }
 
     @Test
@@ -82,7 +111,7 @@ public class ExcelGeneratorTest {
         this.generator.addMappingValue("departments", departments);
 
         Assertions.assertDoesNotThrow(() -> {
-            generator.generate("output1.xlsx");
+            generator.generate("output.xlsx");
         });
     }
 
@@ -96,5 +125,24 @@ public class ExcelGeneratorTest {
         });
     }
 
+    @Test
+    public void nested_nested_each_merge_generate_test() {
+        this.generator = new ExcelGenerator("nested-nested-each-merge-template.xlsx");
+        this.generator.addMappingValue("countries", countries);
+
+        Assertions.assertDoesNotThrow(() -> {
+            generator.generate("nested-nested-output.xlsx");
+        });
+    }
+
+    @Test
+    public void abnormal_nested_nested_each_merge_generate_test() {
+        this.generator = new ExcelGenerator("abnormal-nested-nested-each-merge-template.xlsx");
+        this.generator.addMappingValue("countries", countries);
+
+        Assertions.assertDoesNotThrow(() -> {
+            generator.generate("abnormal-nested-nested-output.xlsx");
+        });
+    }
 
 }

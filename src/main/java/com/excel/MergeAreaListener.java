@@ -39,6 +39,8 @@ public class MergeAreaListener implements AreaListener {
     }
 
     private void merge(CellRef cellRef) {
+        if(this.lastRowCellRef == null) return;
+
         int from = cellRef.getRow();
 
         int lastRow = sheet.getMergedRegions().stream()
