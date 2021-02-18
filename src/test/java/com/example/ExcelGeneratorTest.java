@@ -11,16 +11,17 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 
-public class EmployeeExcelGeneratorTest {
+public class ExcelGeneratorTest {
 
-    private EmployeeExcelGenerator generator;
+    private ExcelGenerator generator;
 
     private List<Department> departments;
 
+    private List<Company> companies;
+
     @BeforeEach
     void setUp() {
-        this.generator = new EmployeeExcelGenerator();
-        this.departments = List.of(
+        departments = List.of(
                 Department.builder()
                         .name("개발 1 팀")
                         .employees(List.of(
@@ -62,12 +63,38 @@ public class EmployeeExcelGeneratorTest {
                         ))
                         .build()
         );
+
+        companies = List.of(
+            Company.builder()
+                    .name("좋은 회사")
+                    .departments(departments)
+                    .build(),
+            Company.builder()
+                    .name("나쁜 회사")
+                    .departments(departments)
+                    .build()
+        );
     }
 
     @Test
-    public void excel_generate_test() {
+    public void department_excel_generate_test() {
+        this.generator = new ExcelGenerator("each-merge-template.xlsx");
+        this.generator.addMappingValue("departments", departments);
+
         Assertions.assertDoesNotThrow(() -> {
-            generator.generate(departments, "output1");
+            generator.generate("output1.xlsx");
         });
     }
+
+    @Test
+    public void nested_each_merge_generate_test() {
+        this.generator = new ExcelGenerator("nested-each-merge-template.xlsx");
+        this.generator.addMappingValue("companies", companies);
+
+        Assertions.assertDoesNotThrow(() -> {
+            generator.generate("nested-output.xlsx");
+        });
+    }
+
+
 }

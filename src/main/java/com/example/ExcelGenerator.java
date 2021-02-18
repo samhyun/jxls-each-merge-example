@@ -11,22 +11,30 @@ import java.io.*;
 import java.util.List;
 
 @Slf4j
-public class EmployeeExcelGenerator {
+public class ExcelGenerator {
 
-    public EmployeeExcelGenerator() {
+    private final String templatePath;
+
+    private final Context context;
+
+    public ExcelGenerator(String templatePath) {
+        this.templatePath = templatePath;
+        this.context = new Context();
+//        this.context.putVar(varName, var);
         XlsCommentAreaBuilder.addCommandMapping(EachMergeCommand.COMMAND_NAME, EachMergeCommand.class);
     }
 
-    public void generate(List<Department> departments, String outputPath) {
+    public void addMappingValue(String varName, Object mappingValue) {
+        this.context.putVar(varName, mappingValue);
+    }
+
+    public void generate(String outputPath) {
         log.info("start employee excel generate");
         try {
-            InputStream is = this.getClass().getClassLoader().getResourceAsStream("each-merge-template.xlsx");
+            InputStream is = this.getClass().getClassLoader().getResourceAsStream(this.templatePath);
             OutputStream os = new FileOutputStream(outputPath);
-
-            Context context = new Context();
-            context.putVar("departments", departments);
             try {
-                JxlsHelper.getInstance().processTemplate(is, os, context);
+                JxlsHelper.getInstance().processTemplate(is, os, this.context);
             } catch (IOException e) {
                 throw new ExcelGenerateException("occurred error in jxls process template", e);
             }
